@@ -21,7 +21,7 @@ def my_callback(client, userdata, message):
     elif cmd == 'start':
         print('start')
     elif cmd == 'stop':
-        client.containers.get(args.docker_container_name).stop()
+        docker_client.containers.get(args.docker_container_name).stop()
     else:
         logger.info("invalid cmd:{}".format(cmd))
 
