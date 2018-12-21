@@ -19,7 +19,14 @@ def my_callback(client, userdata, message):
         except:
             print('status:stopped')
     elif cmd == 'start':
-        print('start')
+        docker_client.containers.run('rpi-gst',
+                                     detach=True,
+                                     name=args.docker_container_name,
+                                     remove=True,
+                                     devices=["/dev/video0", "/dev/vchiq"],
+                                     environment=["stream={}".format(args.stream)],
+                                     volumes={'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
+                                     )
     elif cmd == 'stop':
         docker_client.containers.get(args.docker_container_name).stop()
     else:
