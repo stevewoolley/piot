@@ -78,11 +78,11 @@ if __name__ == "__main__":
                         help="Kinesis video stream")
     parser.add_argument("-i", "--image", action="store", dest="image", default='rpi-gst',
                         help="Docker image")
-    parser.add_argument("-i", "--aws_access_key", action="store", dest="aws_access_key", required=True,
+    parser.add_argument("--aws_access_key", action="store", dest="aws_access_key", required=True,
                         help="AWS Access Key")
-    parser.add_argument("-i", "--aws_secret_key", action="store", dest="aws_secret_key", required=True,
+    parser.add_argument("--aws_secret_key", action="store", dest="aws_secret_key", required=True,
                         help="AWS Secret Key")
-    parser.add_argument("-i", "--aws_region", action="store", dest="aws_region", required=True,
+    parser.add_argument("--aws_region", action="store", dest="aws_region", required=True,
                         help="AWS Region")
     args = parser.parse_args()
 
