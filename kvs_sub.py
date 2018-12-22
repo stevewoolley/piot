@@ -6,6 +6,9 @@ import time
 import argparse
 import docker
 
+DEVICES = ["/dev/video0", "/dev/vchiq"]
+VOLUMES = {'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
+
 
 def my_callback(client, userdata, message):
     docker_client = docker.from_env()
@@ -15,20 +18,37 @@ def my_callback(client, userdata, message):
 
     if cmd == 'status':
         try:
-            print('status:{}'.format(docker_client.containers.get(args.docker_container_name).status))
+            print('{} {} status:{}'.format(
+                args.image,
+                args.docker_container_name,
+                docker_client.containers.get(args.docker_container_name).status)
+            )
         except:
-            print('status:stopped')
+            print('{} {} status:unknown'.format(
+                args.image,
+                args.docker_container_name
+            ))
     elif cmd == 'start':
-        docker_client.containers.run('rpi-gst',
-                                     detach=True,
-                                     name=args.docker_container_name,
-                                     remove=True,
-                                     devices=["/dev/video0", "/dev/vchiq"],
-                                     environment=["stream={}".format(args.stream)],
-                                     volumes={'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
-                                     )
+        result = docker_client.containers.run(
+            args.image,
+            detach=True,
+            name=args.docker_container_name,
+            remove=True,
+            devices=DEVICES,
+            environment=["stream={}".format(args.stream)],
+            volumes=VOLUMES
+        )
+        print('{} {} start:{}'.format(
+            args.image,
+            args.docker_container_name,
+            result.status
+        ))
     elif cmd == 'stop':
         docker_client.containers.get(args.docker_container_name).stop()
+        print('{} {} stop'.format(
+            args.image,
+            args.docker_container_name
+        ))
     else:
         logger.info("invalid cmd:{}".format(cmd))
 
@@ -48,9 +68,11 @@ if __name__ == "__main__":
                         help="Targeted client id")
     parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
     parser.add_argument("-n", "--docker_container_name", action="store", dest="docker_container_name",
-                        default="kvs-streamer", help="Name of docker container")
+                        default="kvs-streamer", help="Container name")
     parser.add_argument("-s", "--stream", action="store", dest="stream", required=True,
-                        help="Name kinesis video stream")
+                        help="Kinesis video stream")
+    parser.add_argument("-i", "--image", action="store", dest="stream", default='rpi-gst',
+                        help="Docker image")
     args = parser.parse_args()
 
     port = args.port
