@@ -35,7 +35,12 @@ def my_callback(client, userdata, message):
             name=args.docker_container_name,
             remove=True,
             devices=DEVICES,
-            environment=["stream={}".format(args.stream)],
+            environment=[
+                "stream={}".format(args.stream),
+                "aws_access_key={}".format(args.aws_access_key),
+                "aws_secret_key={}".format(args.aws_secret_key),
+                "aws_region={}".format(args.aws_region)
+            ],
             volumes=VOLUMES
         )
         print('{} {} start:{}'.format(
@@ -71,8 +76,14 @@ if __name__ == "__main__":
                         default="kvs-streamer", help="Container name")
     parser.add_argument("-s", "--stream", action="store", dest="stream", required=True,
                         help="Kinesis video stream")
-    parser.add_argument("-i", "--image", action="store", dest="stream", default='rpi-gst',
+    parser.add_argument("-i", "--image", action="store", dest="image", default='rpi-gst',
                         help="Docker image")
+    parser.add_argument("-i", "--aws_access_key", action="store", dest="aws_access_key", required=True,
+                        help="AWS Access Key")
+    parser.add_argument("-i", "--aws_secret_key", action="store", dest="aws_secret_key", required=True,
+                        help="AWS Secret Key")
+    parser.add_argument("-i", "--aws_region", action="store", dest="aws_region", required=True,
+                        help="AWS Region")
     args = parser.parse_args()
 
     port = args.port
