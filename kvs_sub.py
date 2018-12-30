@@ -18,13 +18,13 @@ def my_callback(client, userdata, message):
 
     if cmd == 'status':
         try:
-            print('{} {} status:{}'.format(
+            logger.info('kvs_sub {} {} status:{}'.format(
                 args.image,
                 args.docker_container_name,
                 docker_client.containers.get(args.docker_container_name).status)
             )
         except:
-            print('{} {} status:unknown'.format(
+            logger.info('kvs_sub {} {} status:unknown'.format(
                 args.image,
                 args.docker_container_name
             ))
@@ -43,19 +43,19 @@ def my_callback(client, userdata, message):
             ],
             volumes=VOLUMES
         )
-        print('{} {} start:{}'.format(
+        logger.info('kvs_sub {} {} start:{}'.format(
             args.image,
             args.docker_container_name,
             result.status
         ))
     elif cmd == 'stop':
         docker_client.containers.get(args.docker_container_name).stop()
-        print('{} {} stop'.format(
+        logger.info('kvs_sub {} {} stop'.format(
             args.image,
             args.docker_container_name
         ))
     else:
-        logger.info("invalid cmd:{}".format(cmd))
+        logger.warn("kvs_sub invalid cmd:{}".format(cmd))
 
 
 if __name__ == "__main__":
