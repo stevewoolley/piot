@@ -5,6 +5,7 @@ import logging
 import time
 import argparse
 import docker
+import watchtower
 
 DEVICES = ["/dev/video0", "/dev/vchiq"]
 VOLUMES = {'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
@@ -12,19 +13,19 @@ VOLUMES = {'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
 
 def my_callback(client, userdata, message):
     docker_client = docker.from_env()
-    logger.debug("message topic:{} payload:{}".format(message.topic, message.payload))
+    logger.debug("message topic {} payload {}".format(message.topic, message.payload))
     cmd = message.topic.replace('{}/'.format(args.topic), '')
-    logger.debug("message cmd:{}".format(cmd))
+    logger.debug("message command {}".format(cmd))
 
     if cmd == 'status':
         try:
-            logger.info('kvs_sub {} {} status:{}'.format(
+            logger.info('status {} {} {}'.format(
                 args.image,
                 args.docker_container_name,
                 docker_client.containers.get(args.docker_container_name).status)
             )
         except:
-            logger.info('kvs_sub {} {} status:unknown'.format(
+            logger.info('status {} {} unknown'.format(
                 args.image,
                 args.docker_container_name
             ))
@@ -43,19 +44,19 @@ def my_callback(client, userdata, message):
             ],
             volumes=VOLUMES
         )
-        logger.info('kvs_sub {} {} start:{}'.format(
+        logger.info('start {} {} {}'.format(
             args.image,
             args.docker_container_name,
             result.status
         ))
     elif cmd == 'stop':
         docker_client.containers.get(args.docker_container_name).stop()
-        logger.info('kvs_sub {} {} stop'.format(
+        logger.info('stop {} {}'.format(
             args.image,
             args.docker_container_name
         ))
     else:
-        logger.warn("kvs_sub invalid cmd:{}".format(cmd))
+        logger.warn("invalid command {}".format(cmd))
 
 
 if __name__ == "__main__":
@@ -103,12 +104,9 @@ if __name__ == "__main__":
         port = 8883
 
     # Configure logging
-    logger = logging.getLogger("AWSIoTPythonSDK.core")
-    logger.setLevel(logging.INFO)
-    streamHandler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    streamHandler.setFormatter(formatter)
-    logger.addHandler(streamHandler)
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('kvs_sub')
+    logger.addHandler(watchtower.CloudWatchLogHandler(args.stream))
 
     # Init AWSIoTMQTTClient
     myAWSIoTMQTTClient = None

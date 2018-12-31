@@ -17,4 +17,5 @@ requests==2.21.0
 s3transfer==0.1.13
 six==1.12.0
 urllib3==1.24.1
+watchtower==0.5.4
 websocket-client==0.54.0

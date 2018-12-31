@@ -8,6 +8,7 @@ import argparse
 
 cloudwatch = boto3.client('cloudwatch')
 
+
 def os_execute(s):
     """Returns string result of os call"""
     try:
