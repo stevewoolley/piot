@@ -65,6 +65,20 @@ if __name__ == "__main__":
 
     port = args.port
 
+    if args.useWebsocket and args.certificatePath and args.privateKeyPath:
+        parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
+        exit(2)
+
+    if not args.useWebsocket and (not args.certificatePath or not args.privateKeyPath):
+        parser.error("Missing credentials for authentication.")
+        exit(2)
+
+    # Port defaults
+    if args.useWebsocket and not args.port:  # When no port override for WebSocket, default to 443
+        port = 443
+    if not args.useWebsocket and not args.port:  # When no port override for non-WebSocket, default to 8883
+        port = 8883
+
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('output_sub')
@@ -90,7 +104,6 @@ if __name__ == "__main__":
     myAWSIoTMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
     myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
-    logger.info('PORT {}'.format(port))
     myAWSIoTMQTTClient.connect()
     myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 1, my_callback)
     time.sleep(2)
