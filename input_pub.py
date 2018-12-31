@@ -65,7 +65,8 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--shadow_var", help="Shadow variable", required=True)
     parser.add_argument("-y", "--high_value", help="high value", default=1)
     parser.add_argument("-z", "--low_value", help="low value", default=0)
-    parser.add_argument("-o", "--low_topic", nargs='*', help="Low topic (defaults to topic if not assigned")
+    parser.add_argument("-o", "--low_topic", action="store", dest="low_topic",
+                        help="Low topic (defaults to topic if not assigned")
     args = parser.parse_args()
 
     port = args.port
