@@ -87,11 +87,11 @@ if __name__ == "__main__":
     # Init AWSIoTMQTTClient
     myAWSIoTMQTTClient = None
     if args.useWebsocket:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient(useWebsocket=True)
+        myAWSIoTMQTTClient = AWSIoTMQTTClient('', useWebsocket=True)
         myAWSIoTMQTTClient.configureEndpoint(args.host, port)
         myAWSIoTMQTTClient.configureCredentials(args.rootCAPath)
     else:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient()
+        myAWSIoTMQTTClient = AWSIoTMQTTClient('')
         myAWSIoTMQTTClient.configureEndpoint(args.host, port)
         myAWSIoTMQTTClient.configureCredentials(args.rootCAPath, args.privateKeyPath, args.certificatePath)
 
