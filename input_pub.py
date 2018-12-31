@@ -6,6 +6,7 @@ from signal import pause
 from gpiozero import Button
 import argparse
 import watchtower
+import platform
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 
@@ -48,6 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                         help="Use MQTT over WebSocket")
     parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
+    parser.add_argument("--thing", help="thing name", default=platform.node().split('.')[0])
     parser.add_argument("-p", "--pin", help="gpio pin (using BCM numbering)", type=int, required=True)
     parser.add_argument("-u", "--pull_up",
                         help="If True (the default), the GPIO pin will be pulled high by default. " +
