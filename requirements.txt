@@ -8,6 +8,7 @@ docker==3.6.0
 docker-pycreds==0.4.0
 docutils==0.14
 futures==3.2.0
+gpiozero==1.4.1
 idna==2.8
 ipaddress==1.0.22
 jmespath==0.9.3
