@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-input
+    - office-input
+  roles:
+    - input

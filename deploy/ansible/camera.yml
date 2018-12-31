@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-camera
+    - office-camera
+  roles:
+    - camera

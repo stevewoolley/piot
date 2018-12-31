@@ -1,0 +1,19 @@
+---
+- name: 'Install python and dependencies'
+  apt:
+    name: [
+      'python',
+      'python-dev',
+      'python-pip',
+      'python-openssl',
+      'python-testresources'
+    ]
+    state: latest
+
+- name: 'Install python libs'
+  pip:
+    name: [
+      'argparse',
+      'requests'
+    ]
+    state: latest

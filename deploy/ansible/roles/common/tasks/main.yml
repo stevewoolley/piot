@@ -1,0 +1,44 @@
+---
+- name: 'Configure system'
+  import_tasks: config.yml
+
+- name: 'Disable ipv6'
+  sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: 1
+    sysctl_set: yes
+
+- name: 'Update package cache'
+  apt:
+    update_cache: yes
+
+- name: 'Upgrade system to the latest packages'
+  apt:
+    upgrade: safe
+
+- name: 'Install common packages'
+  apt:
+    name: [
+      'rpi-update',
+      'git',
+      'screen',
+      'lsb-release',
+      'build-essential',
+      'pkg-config',
+      'checkinstall',
+      'supervisor',
+      'cmake',
+      'unzip',
+      'rng-tools',
+      'byacc',
+      'autoconf',
+      'automake',
+      'openssl'
+    ]
+    state: latest
+
+- name: 'Install python and python libs'
+  import_tasks: python.yml
+
+- name: 'Install java jdk'
+  import_tasks: java.yml

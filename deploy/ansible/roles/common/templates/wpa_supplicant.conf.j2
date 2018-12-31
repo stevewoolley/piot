@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+ctrl_interface_group=0
+update_config=1
+ap_scan=1
+fast_reauth=1
+country=US
+
+{% for wifi in wifis %}
+network={
+	ssid="{{ wifi.ssid }}"
+	psk="{{ wifi.psk }}"
+	proto=WPA RSN
+	key_mgmt={{ wifi.keymgmt }}
+	pairwise=CCMP TKIP
+	group=CCMP TKIP
+	priority={{ wifi.priority }}
+	id_str="{{ wifi.ssid }}"
+}
+{% endfor %}

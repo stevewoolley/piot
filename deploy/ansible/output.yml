@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-output
+    - office-output
+  roles:
+    - output

@@ -1,0 +1,10 @@
+---
+
+- name: 'Install camera common packages'
+  apt:
+    name: [
+      'gpac'
+    ]
+
+- name: 'Set camera state'
+  import_tasks: camera.yml

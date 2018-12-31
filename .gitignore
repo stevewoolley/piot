@@ -116,3 +116,11 @@ gen
 *.crt
 *.pem
 *.key
+
+/deploy/ansible/ansible.cfg
+/deploy/ansible/hosts
+*.retry
+/deploy/ansible/roles/*/vars/main.yml
+/deploy/ansible/roles/*/templates/*.secret
+/deploy/ansible/host_vars/
+/deploy/ansible/group_vars/
