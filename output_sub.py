@@ -45,10 +45,11 @@ def my_callback(client, user_data, message):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-e", "--endpoint", required=True, help="Your AWS IoT custom endpoint")
-    parser.add_argument("-r", "--rootCA", required=True, help="Root CA file path")
-    parser.add_argument("-c", "--cert", required=True, help="Certificate file path")
-    parser.add_argument("-k", "--key", required=True, help="Private key file path")
+    parser.add_argument("-e", "--endpoint", action="store", required=True, dest="host",
+                        help="Your AWS IoT custom endpoint")
+    parser.add_argument("-r", "--rootCA", action="store", required=True, dest="rootCAPath", help="Root CA file path")
+    parser.add_argument("-c", "--cert", action="store", dest="certificatePath", help="Certificate file path")
+    parser.add_argument("-k", "--key", action="store", dest="privateKeyPath", help="Private key file path")
     parser.add_argument("--port", action="store", dest="port", type=int, help="Port number override")
     parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                         help="Use MQTT over WebSocket")
