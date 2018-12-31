@@ -5,7 +5,7 @@ import time
 import argparse
 
 
-def my_callback(client, userdata, message):
+def callback(client, userdata, message):
     print("sub {} {}".format(message.topic, message.payload))
     if message.topic == args.topic:
         # base topic
@@ -31,8 +31,6 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--port", action="store", dest="port", type=int, help="Port number override")
     parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                         help="Use MQTT over WebSocket")
-    parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
-                        help="Targeted client id")
     parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
     args = parser.parse_args()
 
@@ -55,11 +53,11 @@ if __name__ == "__main__":
     # Init AWSIoTMQTTClient
     myAWSIoTMQTTClient = None
     if args.useWebsocket:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient(args.clientId, useWebsocket=True)
+        myAWSIoTMQTTClient = AWSIoTMQTTClient(useWebsocket=True)
         myAWSIoTMQTTClient.configureEndpoint(args.host, port)
         myAWSIoTMQTTClient.configureCredentials(args.rootCAPath)
     else:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient(args.clientId)
+        myAWSIoTMQTTClient = AWSIoTMQTTClient()
         myAWSIoTMQTTClient.configureEndpoint(args.host, port)
         myAWSIoTMQTTClient.configureCredentials(args.rootCAPath, args.privateKeyPath, args.certificatePath)
 
@@ -72,11 +70,14 @@ if __name__ == "__main__":
 
     myAWSIoTMQTTClient.connect()
     # subscribe to base topic
-    myAWSIoTMQTTClient.subscribe('{}', 1, my_callback)
+    result = myAWSIoTMQTTClient.subscribe('{}'.format(args.topic), 0, callback)
     time.sleep(2)
+    print('Subscribe to {} = {}'.format(args.topic, result))
     # subscribe to subtopics
-    myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 1, my_callback)
+
+    result = myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 0, callback)
     time.sleep(2)
+    print('Subscribe to {} = {}'.format('{}/#'.format(args.topic), result))
 
     while True:
-        time.sleep(1)
+        time.sleep(0.5)
