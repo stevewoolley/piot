@@ -105,6 +105,7 @@ if __name__ == "__main__":
     myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
     myAWSIoTMQTTClient.connect()
+    logger.info('subscribing to {}/#'.format(args.topic))
     myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 1, my_callback)
     time.sleep(2)
 
