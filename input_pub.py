@@ -10,6 +10,14 @@ import platform
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 
+def iot_thing_topic(thing):
+    return "$aws/things/{}/shadow/update".format(thing)
+
+
+def iot_payload(target, doc):
+    return json.dumps({'state': {target: doc}})
+
+
 def high():
     logging.info("publish high {} {} {} {}".format(args.topic, args.shadow_var, args.pin, args.high_value))
     myAWSIoTMQTTClient.publish(
@@ -19,6 +27,14 @@ def high():
                 args.shadow_var: args.high_value,
                 'message': "{} {}".format(args.shadow_var, args.high_value)
             }
+        ),
+        1
+    )
+    myAWSIoTMQTTClient.publish(
+        iot_thing_topic(args.thing),
+        iot_payload(
+            'reported',
+            {args.shadow_var: args.high_value}
         ),
         1
     )
@@ -33,6 +49,14 @@ def low():
                 args.shadow_var: args.low_value,
                 'message': "{} {}".format(args.shadow_var, args.low_value)
             }
+        ),
+        1
+    )
+    myAWSIoTMQTTClient.publish(
+        iot_thing_topic(args.thing),
+        iot_payload(
+            'reported',
+            {args.shadow_var: args.high_value}
         ),
         1
     )
