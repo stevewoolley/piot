@@ -56,7 +56,7 @@ def low():
         iot_thing_topic(args.thing),
         iot_payload(
             'reported',
-            {args.shadow_var: args.high_value}
+            {args.shadow_var: args.low_value}
         ),
         1
     )
