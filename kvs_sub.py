@@ -56,7 +56,7 @@ def my_callback(client, userdata, message):
             args.docker_container_name
         ))
     else:
-        logger.warn("invalid command {}".format(cmd))
+        logger.warning("invalid command {}".format(cmd))
 
 
 if __name__ == "__main__":

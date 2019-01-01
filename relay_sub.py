@@ -15,7 +15,7 @@ TOPIC_STATUS_PULSE = ['blink', 'pulse']
 
 
 def device(cmd):
-    logging.debug("device {}".format(cmd))
+    logger.debug("device {}".format(cmd))
     if args.pin is not None:
         if cmd < 0:
             output.on()
@@ -42,7 +42,7 @@ def callback(client, user_data, message):
     elif cmd in TOPIC_STATUS_OFF:
         device(0)
     else:
-        logging.warning('callback unrecognized command: {}'.format(cmd))
+        logger.warning('callback unrecognized command: {}'.format(cmd))
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ def iot_payload(target, doc):
 
 
 def high():
-    logging.info("publish high {} {} {} {}".format(args.topic, args.shadow_var, args.pin, args.high_value))
+    logger.info("publish high {} {} {} {}".format(args.topic, args.shadow_var, args.pin, args.high_value))
     myAWSIoTMQTTClient.publish(
         args.topic,
         json.dumps(
@@ -41,7 +41,7 @@ def high():
 
 
 def low():
-    logging.info("publish low {} {} {} {}".format(args.low_topic, args.shadow_var, args.pin, args.low_value))
+    logger.info("publish low {} {} {} {}".format(args.low_topic, args.shadow_var, args.pin, args.low_value))
     myAWSIoTMQTTClient.publish(
         args.low_topic,
         json.dumps(
