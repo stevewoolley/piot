@@ -3,11 +3,11 @@
 import piot
 import json
 import logging
-from signal import pause
-from gpiozero import Button
-import argparse
-import watchtower
 import platform
+import watchtower
+import argparse
+from signal import pause
+from gpiozero import MotionSensor
 
 
 def pub(topic, value):
@@ -20,12 +20,15 @@ def pub(topic, value):
         piot.iot_payload('reported', {args.shadow_var: value}), 1)
 
 
-def high():
+def motion():
     pub(args.topic, args.high_value)
 
 
-def low():
-    pub(args.low_topic, args.low_value)
+def no_motion():
+    if args.low_topic:
+        pub(args.low_topic, args.low_value)
+    else:
+        pub(args.topic, args.low_value)
 
 
 if __name__ == "__main__":
@@ -41,22 +44,22 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
     parser.add_argument("--thing", help="thing name", default=platform.node().split('.')[0])
     parser.add_argument("-p", "--pin", help="gpio pin (using BCM numbering)", type=int, required=True)
-    parser.add_argument("-u", "--pull_up",
-                        help="If True (the default), the GPIO pin will be pulled high by default. " +
-                             "In this case, connect the other side of the button to ground. " +
-                             "If False, the GPIO pin will be pulled low by default. " +
-                             "In this case, connect the other side of the button to 3V3",
-                        default=True)
-    parser.add_argument("-b", "--bounce_time",
-                        help="If None (the default), no software bounce compensation will be performed. " +
-                             "Otherwise, this is the length of time (in seconds) " +
-                             "that the component will ignore changes in state after an initial change.",
-                        type=float, default=None)
+    parser.add_argument("-q", "--queue_len",
+                        help="The length of the queue used to store values read from the sensor. (1 = disabled)",
+                        type=int, default=1)
+    parser.add_argument("-w", "--sample_rate",
+                        help="The number of values to read from the device " +
+                             "(and append to the internal queue) per second",
+                        type=float, default=100)
+    parser.add_argument("-x", "--threshold",
+                        help="When the mean of all values in the internal queue rises above this value, " +
+                             "the sensor will be considered active by the is_active property, " +
+                             "and all appropriate events will be fired",
+                        type=float, default=0.5)
     parser.add_argument("-s", "--shadow_var", help="Shadow variable", required=True)
     parser.add_argument("-y", "--high_value", help="high value", default=1)
     parser.add_argument("-z", "--low_value", help="low value", default=0)
-    parser.add_argument("-o", "--low_topic", action="store", dest="low_topic",
-                        help="Low topic (defaults to topic if not assigned")
+    parser.add_argument("-o", "--low_topic", nargs='*', help="Low topic")
     args = parser.parse_args()
 
     if args.useWebsocket and args.certificatePath and args.privateKeyPath:
@@ -76,13 +79,9 @@ if __name__ == "__main__":
     myAWSIoTMQTTClient = piot.init_aws_iot_mqtt_client(args)
     myAWSIoTMQTTClient.connect()
 
-    inp = Button(args.pin, pull_up=args.pull_up, bounce_time=args.bounce_time)
+    pir = MotionSensor(args.pin, queue_len=args.queue_len, sample_rate=args.sample_rate, threshold=args.threshold)
 
-    # default low_topic to topic if not defined
-    if args.low_topic is None or len(args.low_topic) == 0:
-        args.low_topic = args.topic
-
-    inp.when_pressed = high
-    inp.when_released = low
+    pir.when_motion = motion
+    pir.when_no_motion = no_motion
 
     pause()

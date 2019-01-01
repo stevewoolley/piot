@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import time
 import argparse
+import piot
 
 
 def callback(client, userdata, message):
@@ -12,11 +12,7 @@ def callback(client, userdata, message):
         print("base topic {}".format(message.topic))
     else:
         # sub topic
-        suffix = message.topic.replace('{}/'.format(args.topic), '').split('/')
-        arg = None
-        cmd = suffix[0]
-        if len(suffix) > 1:
-            arg = suffix[1]
+        cmd, arg = piot.topic_parser(args.topic, message.topic)
         print("sub topic {} {}".format(cmd, arg))
 
 
@@ -34,8 +30,6 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
     args = parser.parse_args()
 
-    port = args.port
-
     if args.useWebsocket and args.certificatePath and args.privateKeyPath:
         parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
         exit(2)
@@ -44,40 +38,19 @@ if __name__ == "__main__":
         parser.error("Missing credentials for authentication.")
         exit(2)
 
-    # Port defaults
-    if args.useWebsocket and not args.port:  # When no port override for WebSocket, default to 443
-        port = 443
-    if not args.useWebsocket and not args.port:  # When no port override for non-WebSocket, default to 8883
-        port = 8883
-
     # Init AWSIoTMQTTClient
-    myAWSIoTMQTTClient = None
-    if args.useWebsocket:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient('', useWebsocket=True)
-        myAWSIoTMQTTClient.configureEndpoint(args.host, port)
-        myAWSIoTMQTTClient.configureCredentials(args.rootCAPath)
-    else:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient('')
-        myAWSIoTMQTTClient.configureEndpoint(args.host, port)
-        myAWSIoTMQTTClient.configureCredentials(args.rootCAPath, args.privateKeyPath, args.certificatePath)
-
-    # AWSIoTMQTTClient connection configuration
-    myAWSIoTMQTTClient.configureAutoReconnectBackoffTime(1, 32, 20)
-    myAWSIoTMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
-    myAWSIoTMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
-    myAWSIoTMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
-    myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
-
+    myAWSIoTMQTTClient = piot.init_aws_iot_mqtt_client(args)
     myAWSIoTMQTTClient.connect()
-    # subscribe to base topic
+
+    # subscribe to topic
     result = myAWSIoTMQTTClient.subscribe('{}'.format(args.topic), 0, callback)
     time.sleep(2)
     print('Subscribe to {} = {}'.format(args.topic, result))
-    # subscribe to subtopics
 
+    # subscribe to subtopics
     result = myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 0, callback)
     time.sleep(2)
     print('Subscribe to {} = {}'.format('{}/#'.format(args.topic), result))
 
     while True:
-        time.sleep(0.5)
+        time.sleep(1)

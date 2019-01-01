@@ -1,22 +1,21 @@
 #!/usr/bin/env python
 
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import logging
 import time
 import argparse
 import docker
 import watchtower
+import piot
 
 DEVICES = ["/dev/video0", "/dev/vchiq"]
 VOLUMES = {'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
 
 
-def my_callback(client, userdata, message):
+def callback(client, userdata, message):
     docker_client = docker.from_env()
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
-    cmd = message.topic.replace('{}/'.format(args.topic), '')
-    logger.debug("message command {}".format(cmd))
-
+    cmd, arg = piot.topic_parser(args.topic, message.topic)
+    logger.info("callback {}".format(cmd))
     if cmd == 'status':
         try:
             logger.info('status {} {} {}'.format(
@@ -85,8 +84,6 @@ if __name__ == "__main__":
                         help="AWS Region")
     args = parser.parse_args()
 
-    port = args.port
-
     if args.useWebsocket and args.certificatePath and args.privateKeyPath:
         parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
         exit(2)
@@ -95,37 +92,15 @@ if __name__ == "__main__":
         parser.error("Missing credentials for authentication.")
         exit(2)
 
-    # Port defaults
-    if args.useWebsocket and not args.port:  # When no port override for WebSocket, default to 443
-        port = 443
-    if not args.useWebsocket and not args.port:  # When no port override for non-WebSocket, default to 8883
-        port = 8883
-
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('kvs_sub')
     logger.addHandler(watchtower.CloudWatchLogHandler(args.stream))
 
     # Init AWSIoTMQTTClient
-    myAWSIoTMQTTClient = None
-    if args.useWebsocket:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient('', useWebsocket=True)
-        myAWSIoTMQTTClient.configureEndpoint(args.host, port)
-        myAWSIoTMQTTClient.configureCredentials(args.rootCAPath)
-    else:
-        myAWSIoTMQTTClient = AWSIoTMQTTClient('')
-        myAWSIoTMQTTClient.configureEndpoint(args.host, port)
-        myAWSIoTMQTTClient.configureCredentials(args.rootCAPath, args.privateKeyPath, args.certificatePath)
-
-    # AWSIoTMQTTClient connection configuration
-    myAWSIoTMQTTClient.configureAutoReconnectBackoffTime(1, 32, 20)
-    myAWSIoTMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
-    myAWSIoTMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
-    myAWSIoTMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
-    myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
-
+    myAWSIoTMQTTClient = piot.init_aws_iot_mqtt_client(args)
     myAWSIoTMQTTClient.connect()
-    myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 1, my_callback)
+    myAWSIoTMQTTClient.subscribe('{}/#'.format(args.topic), 1, callback)
     time.sleep(2)
 
     while True:
