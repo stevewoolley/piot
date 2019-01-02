@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser.add_argument("-q", "--queue_len",
                         help="The length of the queue used to store values read from the sensor. (1 = disabled)",
                         type=int, default=1)
-    parser.add_argument("-w", "--sample_rate",
+    parser.add_argument("--sample_rate",
                         help="The number of values to read from the device " +
                              "(and append to the internal queue) per second",
                         type=float, default=100)

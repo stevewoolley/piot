@@ -17,7 +17,7 @@ command={{ webapps_dir }}/pir_pub.py
     -z {{ item.value.low_value }}
 {% endif %}
 {% if item.value.sample_rate is defined %}
-    -w {{ item.value.sample_rate }}
+    --sample_rate {{ item.value.sample_rate }}
 {% endif %}
 {% if item.value.queue_len is defined %}
     -q {{ item.value.queue_len }}
