@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     # Configure logging
     logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger('input_pub')
+    logger = logging.getLogger('pir_pub')
     logger.addHandler(watchtower.CloudWatchLogHandler(args.thing))
 
     # Init AWSIoTMQTTClient
