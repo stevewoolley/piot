@@ -29,25 +29,33 @@ def callback(client, userdata, message):
                 args.docker_container_name
             ))
     elif cmd == 'start':
-        result = docker_client.containers.run(
-            args.image,
-            detach=True,
-            name=args.docker_container_name,
-            remove=True,
-            devices=DEVICES,
-            environment=[
-                "stream={}".format(args.stream),
-                "aws_access_key={}".format(args.aws_access_key),
-                "aws_secret_key={}".format(args.aws_secret_key),
-                "aws_region={}".format(args.aws_region)
-            ],
-            volumes=VOLUMES
-        )
-        logger.info('start {} {} {}'.format(
-            args.image,
-            args.docker_container_name,
-            result.status
-        ))
+        try:
+            result = docker_client.containers.run(
+                args.image,
+                detach=True,
+                name=args.docker_container_name,
+                remove=True,
+                devices=DEVICES,
+                environment=[
+                    "stream={}".format(args.stream),
+                    "aws_access_key={}".format(args.aws_access_key),
+                    "aws_secret_key={}".format(args.aws_secret_key),
+                    "aws_region={}".format(args.aws_region)
+                ],
+                volumes=VOLUMES
+            )
+            logger.info('start {} {} {}'.format(
+                args.image,
+                args.docker_container_name,
+                result.status
+            ))
+        except Exception as e:
+            logger.info('start failed {} {} {}'.format(
+                args.image,
+                args.docker_container_name,
+                e.message
+            ))
+
     elif cmd == 'stop':
         try:
             docker_client.containers.get(args.docker_container_name).stop()
