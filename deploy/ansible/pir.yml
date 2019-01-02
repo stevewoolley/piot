@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-pir
+    - office-pir
+  roles:
+    - pir

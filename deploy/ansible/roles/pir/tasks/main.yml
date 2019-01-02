@@ -1,0 +1,28 @@
+---
+- name: 'Set hostname facts'
+  set_fact:
+    full_hostname="{{ inventory_hostname }}"
+    short_hostname="{{ inventory_hostname.split('.', 1)[0] }}"
+
+- name: 'Clone/Update latest repo'
+  git:
+    repo: https://github.com/stevewoolley/piot.git
+    dest: piot
+    accept_hostkey: yes
+  become: yes
+  become_user: "{{ user }}"
+
+- name: 'Supervisor script for pir_pub'
+  template:
+    src: pir_pub.conf.j2
+    dest: "/etc/supervisor/conf.d/pir_pub-{{ item.value.pin }}.conf"
+    mode: 0644
+  with_dict: "{{ pirs }}"
+  become: yes
+
+- name: 'Restart pir_pub via supervisor'
+  supervisorctl:
+    name: pir_pub-{{ item.value.pin }}
+    state: restarted
+  become: yes
+  with_dict: "{{ pirs }}"
