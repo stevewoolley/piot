@@ -23,7 +23,7 @@ def callback(client, userdata, message):
                 args.docker_container_name,
                 docker_client.containers.get(args.docker_container_name).status)
             )
-        except:
+        except Exception as e:
             logger.info('status {} {} unknown'.format(
                 args.image,
                 args.docker_container_name
@@ -49,11 +49,20 @@ def callback(client, userdata, message):
             result.status
         ))
     elif cmd == 'stop':
-        docker_client.containers.get(args.docker_container_name).stop()
-        logger.info('stop {} {}'.format(
-            args.image,
-            args.docker_container_name
-        ))
+        try:
+            docker_client.containers.get(args.docker_container_name).stop()
+            logger.info('stop {} {}'.format(
+                args.image,
+                args.docker_container_name
+            ))
+        except Exception as e:
+            logger.warning('stop failed {} {} {}'.format(
+                args.image,
+                args.docker_container_name,
+                e.message
+            ))
+
+
     else:
         logger.warning("invalid command {}".format(cmd))
 
