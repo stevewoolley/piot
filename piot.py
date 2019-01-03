@@ -1,6 +1,11 @@
 import json
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
+TOPIC_STATUS_ON = ['1', 'on']
+TOPIC_STATUS_OFF = ['0', 'off']
+TOPIC_STATUS_TOGGLE = ['toggle']
+TOPIC_STATUS_PULSE = ['blink', 'pulse']
+
 
 def iot_thing_topic(thing):
     return "$aws/things/{}/shadow/update".format(thing)

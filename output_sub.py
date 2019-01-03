@@ -8,11 +8,6 @@ import argparse
 import piot
 from gpiozero import DigitalOutputDevice
 
-TOPIC_STATUS_ON = ['1', 'on']
-TOPIC_STATUS_OFF = ['0', 'off']
-TOPIC_STATUS_TOGGLE = ['toggle']
-TOPIC_STATUS_PULSE = ['blink', 'pulse']
-
 
 def device(cmd):
     logger.debug("device {}".format(cmd))
@@ -29,11 +24,11 @@ def my_callback(client, user_data, message):
     logger.debug("callback message {} {}".format(message.topic, message.payload))
     cmd, arg = piot.topic_parser(args.topic, message.topic)
     logger.info("callback {} {}".format(cmd, arg))
-    if cmd in TOPIC_STATUS_PULSE:
+    if cmd in piot.TOPIC_STATUS_PULSE:
         device(int(arg))
-    elif cmd in TOPIC_STATUS_ON:
+    elif cmd in piot.TOPIC_STATUS_ON:
         device(-1)
-    elif cmd in TOPIC_STATUS_OFF:
+    elif cmd in piot.TOPIC_STATUS_OFF:
         device(0)
     else:
         logger.warning('callback unrecognized command: {}'.format(cmd))
