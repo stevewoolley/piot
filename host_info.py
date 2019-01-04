@@ -41,7 +41,7 @@ if __name__ == "__main__":
     if sys.platform == 'darwin':
         # mac
         properties["release"] = platform.mac_ver()[0]
-    elif sys.platform == 'darwin' and platform.machine().startswith('arm'):
+    elif sys.platform == 'linux2' and platform.machine().startswith('arm'):
         # raspberry pi
         properties["distribution"] = "{} {}".format(platform.linux_distribution()[0], platform.linux_distribution()[1])
         properties["hardware"] = "Pi Model {} V{}".format(pi_info().model, pi_info().pcb_revision)
