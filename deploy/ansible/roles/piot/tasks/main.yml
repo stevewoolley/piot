@@ -34,7 +34,7 @@
     dest: /home/pi/piot/{{ iot_cert }}-private.pem.key
     owner: "{{ user }}"
     group: "{{ group }}"
-    mode: 600
+    mode: 0644
 
 - name: 'Install IoT certificate'
   copy:
@@ -42,15 +42,7 @@
     dest: /home/pi/piot/{{ iot_cert }}-certificate.pem.crt
     owner: "{{ user }}"
     group: "{{ group }}"
-    mode: 600
-
-- name: 'Install Root CA'
-  copy:
-    src: ~/.ssh/credentials/root.ca.pem
-    dest: /home/pi/piot/root.ca.pem
-    owner: "{{ user }}"
-    group: "{{ group }}"
-    mode: 600
+    mode: 0644
 
 - name: 'Install Amazon Root CA'
   copy:
@@ -58,7 +50,7 @@
     dest: /home/pi/piot/AmazonRootCA1.pem
     owner: "{{ user }}"
     group: "{{ group }}"
-    mode: 600
+    mode: 0644
 
 - name: 'Create iot log file'
   file:

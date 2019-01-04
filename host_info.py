@@ -4,10 +4,11 @@ import psutil
 import platform
 import argparse
 import piot
-try:
+import sys
+
+if sys.platform == 'linux2':
     from gpiozero import *
-except ImportError:
-    pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -35,11 +36,17 @@ if __name__ == "__main__":
             if family == 2:
                 properties[i] = address
 
-    if platform.system() == 'Darwin':  # mac
+    if sys.platform == 'darwin':
+        # mac
         properties["release"] = platform.mac_ver()[0]
-    elif platform.machine().startswith('arm') and platform.system() == 'Linux':  # raspberry pi
-        properties["distribution"] = "{} {}".format(platform.dist()[0], platform.dist()[1])
+    elif sys.platform == 'darwin' and platform.machine().startswith('arm'):
+        # raspberry pi
+        properties["distribution"] = "{} {}".format(platform.linux_distribution()[0], platform.linux_distribution()[1])
         properties["hardware"] = "Pi Model {} V{}".format(pi_info().model, pi_info().pcb_revision)
+    elif sys.platform == 'win32':
+        # windows
+        properties["distribution"] = "{} {}".format(platform.system(), platform.release())
+        properties["hardware"] = platform.machine()
 
     myAWSIoTMQTTClient.publish(
         piot.iot_thing_topic(args.thing),

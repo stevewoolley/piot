@@ -25,3 +25,13 @@
     job: "/home/pi/piot/perf_cw.py -n {{ iot_namespace }} --hostname {{ short_hostname }}"
   become: yes
   become_user: "{{ user }}"
+
+- name: 'Crontab entry for host info once a day'
+  cron:
+    name: "host info daily"
+    hour: "23"
+    minute: "0"
+    job: "/home/pi/piot/host_info.py -e {{ aws_iot_endpoint }} -r {{ creds_location }}/AmazonRootCA1.pem -c {{ creds_location }}/{{ iot_cert }}-certificate.pem.crt -k {{ creds_location }}/{{ iot_cert }}-private.pem.key"
+  become: yes
+  become_user: "{{ user }}"
+
