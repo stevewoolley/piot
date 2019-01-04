@@ -36,6 +36,8 @@ if __name__ == "__main__":
             if family == 2:
                 properties[i] = address
 
+    properties["hostname"] = platform.node()
+
     if sys.platform == 'darwin':
         # mac
         properties["release"] = platform.mac_ver()[0]
