@@ -35,8 +35,12 @@
   become: yes
   become_user: "{{ user }}"
 
-- name: 'Crontab entry for host info on reboot'
-  cron:
-    name: "host info reboot"
-    job: "bash /home/pi/piot/host_info.py -e {{ aws_iot_endpoint }} -r {{ creds_location }}/AmazonRootCA1.pem -c {{ creds_location }}/{{ iot_cert }}-certificate.pem.crt -k {{ creds_location }}/{{ iot_cert }}-private.pem.key"
-    special_time: reboot
+- name: 'Set rc.local to execute host_info at boot'
+  lineinfile:
+    path: /etc/rc.local
+    regexp: '^/home/pi/piot/host_info.py'
+    line: '/home/pi/piot/host_info.py -e {{ aws_iot_endpoint }} -r {{ creds_location }}/AmazonRootCA1.pem -c {{ creds_location }}/{{ iot_cert }}-certificate.pem.crt -k {{ creds_location }}/{{ iot_cert }}-private.pem.key'
+    owner: root
+    group: root
+    mode: 0755
+    insertbefore: 'exit 0'
