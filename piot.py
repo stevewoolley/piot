@@ -24,6 +24,22 @@ def topic_parser(prefix, message_topic):
     return cmd, arg
 
 
+def cloudwatch_metric_data(hostname, metric, value, unit, dimension='hostname'):
+    return [
+        {
+            'MetricName': metric,
+            'Dimensions': [
+                {
+                    'Name': dimension,
+                    'Value': hostname
+                },
+            ],
+            'Unit': unit,
+            'Value': value
+        },
+    ]
+
+
 def init_aws_iot_mqtt_client(args):
     # Init AWSIoTMQTTClient
     client = None

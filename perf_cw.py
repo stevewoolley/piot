@@ -5,6 +5,7 @@ import psutil
 import subprocess as sp
 import platform
 import argparse
+import piot
 
 cloudwatch = boto3.client('cloudwatch')
 
@@ -23,21 +24,9 @@ def get_rpi_cpu_temperature():
     return float(temp.split('=')[1].strip('\'C'))
 
 
-def cw_put_metric(metric_name, value, unit):
+def cw_put_metric(metric, value, unit):
     cloudwatch.put_metric_data(
-        MetricData=[
-            {
-                'MetricName': metric_name,
-                'Dimensions': [
-                    {
-                        'Name': 'hostname',
-                        'Value': args.hostname
-                    },
-                ],
-                'Unit': unit,
-                'Value': value
-            },
-        ],
+        MetricData=piot.cloudwatch_metric_data(args.hostname, metric, value, unit),
         Namespace=args.namespace
     )
 
