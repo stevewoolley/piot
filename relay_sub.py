@@ -72,7 +72,7 @@ if __name__ == "__main__":
         exit(2)
 
     # Configure logging
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format=piot.LOG_FORMAT)
     logger = logging.getLogger('relay_sub')
     logger.addHandler(watchtower.CloudWatchLogHandler(args.thing))
 
