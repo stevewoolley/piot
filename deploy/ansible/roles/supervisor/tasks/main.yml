@@ -18,11 +18,11 @@
   become: yes
   become_user: "{{ user }}"
 
-# - name: 'set supervisor conf'
-#  become: yes
-#  template: src=supervisor.conf.j2 dest=/etc/supervisor/supervisord.conf
-#  notify:
-#    - restart supervisord
+- name: 'set supervisor conf'
+  become: yes
+  template: src=supervisor.conf.j2 dest=/etc/supervisor/supervisord.conf
+  notify:
+    - restart supervisord
 
 - name: 'create supervisor_sub conf'
   become: yes
@@ -30,3 +30,9 @@
     src: supervisor_sub.conf.j2
     dest: /etc/supervisor/conf.d/supervisor_sub.conf
     mode: 0644
+
+- name: 'Restart supervisor_sub in supervisor'
+  supervisorctl:
+    name: supervisor_sub
+    state: restarted
+  become: yes

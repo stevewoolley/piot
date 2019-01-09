@@ -30,6 +30,18 @@ def callback(client, userdata, message):
         except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
                 AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
             logger.warn("callback publish timeout")
+    elif cmd == 'start':
+        logger.info('{} {}'.format(cmd, arg))
+        try:
+            proxy.supervisor.startProcess(arg)
+        except Exception as err:
+            logging.error("{} {} failed {}".format(cmd, arg, err))
+    elif cmd == 'stop':
+        logger.info('{} {}'.format(cmd, arg))
+        try:
+            proxy.supervisor.stopProcess(arg)
+        except Exception as err:
+            logging.error("{} {} failed {}".format(cmd, arg, err))
 
 
 if __name__ == "__main__":
