@@ -35,6 +35,13 @@ def callback(client, userdata, message):
     logger.info("callback {}".format(cmd))
     if cmd == 'status':
         publish_status()
+    elif cmd == 'reload':
+        logger.info('{}'.format(cmd))
+        try:
+            proxy.supervisor.restart()
+        except Exception as err:
+            logging.error("{} failed {}".format(cmd, err))
+        publish_status(10)
     elif cmd == 'start':
         logger.info('{} {}'.format(cmd, arg))
         try:
