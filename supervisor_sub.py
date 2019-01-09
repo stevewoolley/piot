@@ -13,35 +13,42 @@ import AWSIoTPythonSDK.exception.AWSIoTExceptions
 SHADOW_VAR = 'supervised'
 
 
+def publish_status(delay=2):
+    time.sleep(delay)
+    results = proxy.supervisor.getAllProcessInfo()
+    supervised = []
+    for s in results:
+        supervised.append('{} ({})'.format(s['name'], s['statename']))
+    logger.info("supervised: {}".format(', '.join(supervised)))
+    try:
+        myAWSIoTMQTTClient.publish(
+            piot.iot_thing_topic(args.thing),
+            piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 0)
+    except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
+            AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
+        logger.warn("callback publish timeout")
+
+
 def callback(client, userdata, message):
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
     cmd, arg = piot.topic_parser(args.topic, message.topic)
     logger.info("callback {}".format(cmd))
     if cmd == 'status':
-        results = proxy.supervisor.getAllProcessInfo()
-        supervised = []
-        for s in results:
-            supervised.append('{} ({})'.format(s['name'], s['statename']))
-        logger.info("supervised: {}".format(', '.join(supervised)))
-        try:
-            myAWSIoTMQTTClient.publish(
-                piot.iot_thing_topic(args.thing),
-                piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 0)
-        except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
-                AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
-            logger.warn("callback publish timeout")
+        publish_status(0)
     elif cmd == 'start':
         logger.info('{} {}'.format(cmd, arg))
         try:
             proxy.supervisor.startProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
+        publish_status()
     elif cmd == 'stop':
         logger.info('{} {}'.format(cmd, arg))
         try:
             proxy.supervisor.stopProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
+        publish_status()
 
 
 if __name__ == "__main__":
