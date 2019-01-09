@@ -26,7 +26,7 @@ def callback(client, userdata, message):
         try:
             myAWSIoTMQTTClient.publish(
                 piot.iot_thing_topic(args.thing),
-                piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 1)
+                piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 0)
         except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
                 AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
             logger.warn("callback publish timeout")
