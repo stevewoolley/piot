@@ -56,7 +56,7 @@ if __name__ == "__main__":
     # Configure logging
     logging.basicConfig(level=logging.INFO, format=piot.LOG_FORMAT)
     logger = logging.getLogger('supervisor_sub')
-    logger.addHandler(watchtower.CloudWatchLogHandler(args.stream))
+    logger.addHandler(watchtower.CloudWatchLogHandler(args.thing))
 
     proxy = xmlrpclib.ServerProxy(
         args.uri, transport=supervisor.xmlrpc.SupervisorTransport(
