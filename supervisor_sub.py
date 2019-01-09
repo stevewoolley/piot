@@ -8,6 +8,7 @@ import time
 import xmlrpclib
 import supervisor.xmlrpc
 import platform
+import AWSIoTPythonSDK.exception.AWSIoTExceptions
 
 SHADOW_VAR = 'supervised'
 
@@ -22,9 +23,13 @@ def callback(client, userdata, message):
         for s in results:
             supervised.append('{} ({})'.format(s['name'], s['statename']))
         logger.info("supervised: {}".format(', '.join(supervised)))
-        myAWSIoTMQTTClient.publish(
-            piot.iot_thing_topic(args.thing),
-            piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 1)
+        try:
+            myAWSIoTMQTTClient.publish(
+                piot.iot_thing_topic(args.thing),
+                piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 1)
+        except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
+                AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
+            logger.warn("callback publish timeout")
 
 
 if __name__ == "__main__":

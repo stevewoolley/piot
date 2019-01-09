@@ -5,7 +5,6 @@ command={{ webapps_dir }}/supervisor_sub.py
     -c {{ creds_location }}/{{ iot_cert }}-certificate.pem.crt
     -k {{ creds_location }}/{{ iot_cert }}-private.pem.key
     -t {{ short_hostname }}/supervisor
-
 directory={{ webapps_dir }}
 autostart=true
 autorestart=true
