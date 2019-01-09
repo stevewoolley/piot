@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home
+    - office
+  roles:
+    - supervisor
