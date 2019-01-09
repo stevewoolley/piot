@@ -30,4 +30,3 @@
     src: supervisor_sub.conf.j2
     dest: /etc/supervisor/conf.d/supervisor_sub.conf
     mode: 0644
-  with_dict: "{{ supervisors }}"
