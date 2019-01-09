@@ -13,7 +13,7 @@ import AWSIoTPythonSDK.exception.AWSIoTExceptions
 SHADOW_VAR = 'supervised'
 
 
-def publish_status(delay=2):
+def publish_status(delay=0):
     time.sleep(delay)
     results = proxy.supervisor.getAllProcessInfo()
     supervised = []
@@ -34,21 +34,21 @@ def callback(client, userdata, message):
     cmd, arg = piot.topic_parser(args.topic, message.topic)
     logger.info("callback {}".format(cmd))
     if cmd == 'status':
-        publish_status(0)
+        publish_status()
     elif cmd == 'start':
         logger.info('{} {}'.format(cmd, arg))
         try:
             proxy.supervisor.startProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
-        publish_status()
+        publish_status(4)
     elif cmd == 'stop':
         logger.info('{} {}'.format(cmd, arg))
         try:
             proxy.supervisor.stopProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
-        publish_status()
+        publish_status(4)
 
 
 if __name__ == "__main__":
