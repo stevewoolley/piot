@@ -32,30 +32,29 @@ def publish_status(delay=0):
 def callback(client, userdata, message):
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
     cmd, arg = piot.topic_parser(args.topic, message.topic)
-    logger.info("callback {}".format(cmd))
-    if cmd == 'status':
+    logger.info("{} {}".format(cmd, arg))
+    if cmd == 'status' and arg is None:
         publish_status()
-    elif cmd == 'reload':
-        logger.info('{}'.format(cmd))
+    elif cmd == 'reload' and arg is None:
         try:
             proxy.supervisor.restart()
         except Exception as err:
             logging.error("{} failed {}".format(cmd, err))
         publish_status(10)
-    elif cmd == 'start':
-        logger.info('{} {}'.format(cmd, arg))
+    elif cmd == 'start' and arg is not None:
         try:
             proxy.supervisor.startProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
         publish_status(4)
-    elif cmd == 'stop':
-        logger.info('{} {}'.format(cmd, arg))
+    elif cmd == 'stop' and arg is not None:
         try:
             proxy.supervisor.stopProcess(arg)
         except Exception as err:
             logging.error("{} {} failed {}".format(cmd, arg, err))
         publish_status(4)
+    else:
+        logging.error('invalid command {} {}'.format(cmd, arg))
 
 
 if __name__ == "__main__":
