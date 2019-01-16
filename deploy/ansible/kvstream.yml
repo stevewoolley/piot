@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-kvstream
+    - office-kvstream
+  roles:
+    - kvstream

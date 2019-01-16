@@ -1,0 +1,10 @@
+---
+- hosts:
+    - home-kvstream
+    - office-kvstream
+  roles:
+    - common
+    - piot
+    - camera
+    - metrics
+    - supervisor
