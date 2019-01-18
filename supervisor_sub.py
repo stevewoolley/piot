@@ -12,18 +12,19 @@ import AWSIoTPythonSDK.exception.AWSIoTExceptions
 
 SHADOW_VAR = 'supervised'
 
+processes = {}
+
 
 def publish_status(delay=0):
     time.sleep(delay)
     results = proxy.supervisor.getAllProcessInfo()
-    supervised = []
     for s in results:
-        supervised.append('{} ({})'.format(s['name'], s['statename']))
-    logger.info("supervised: {}".format(', '.join(supervised)))
+        processes[s['name']] = s['statename']
+    logger.info("supervised: {}".format(processes))
     try:
         myAWSIoTMQTTClient.publish(
             piot.iot_thing_topic(args.thing),
-            piot.iot_payload('reported', {SHADOW_VAR: ', '.join(supervised)}), 0)
+            piot.iot_payload('reported', processes), 0)
     except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
             AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
         logger.warn("callback publish timeout")
