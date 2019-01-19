@@ -20,15 +20,14 @@ def iot_payload(target, doc):
 
 def topic_parser(prefix, message_topic):
     suffix = message_topic.replace('{}/'.format(prefix), '').split('/')
-    arg2 = None
     arg = None
+    arg2 = None
     cmd = suffix[0]
-    if len(suffix) == 2:
+    if len(suffix) > 1:
         arg = suffix[1]
-        return cmd, arg
-    elif len(suffix) > 2:
+    if len(suffix) > 2:
         arg2 = suffix[2]
-        return cmd, arg, arg2
+    return cmd, arg, arg2
 
 
 def cloudwatch_metric_data(hostname, metric, value, unit, dimension='hostname'):

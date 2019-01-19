@@ -14,7 +14,7 @@ VOLUMES = {'/opt/vc/': {'bind': '/opt/vc', 'mode': 'rw'}}
 def callback(client, userdata, message):
     docker_client = docker.from_env()
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
-    cmd, arg = piot.topic_parser(args.topic, message.topic)
+    cmd, arg, arg2 = piot.topic_parser(args.topic, message.topic)
     logger.info("callback {}".format(cmd))
     if cmd == 'status':
         try:

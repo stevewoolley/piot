@@ -12,7 +12,7 @@ def callback(client, userdata, message):
         print("base topic {}".format(message.topic))
     else:
         # sub topic
-        cmd, arg = piot.topic_parser(args.topic, message.topic)
+        cmd, arg, arg2 = piot.topic_parser(args.topic, message.topic)
         print("sub topic {} {}".format(cmd, arg))
 
 

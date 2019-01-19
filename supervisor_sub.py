@@ -5,6 +5,7 @@ import logging
 import watchtower
 import piot
 import time
+from datetime import datetime, timedelta
 import xmlrpclib
 import supervisor.xmlrpc
 import platform
@@ -12,48 +13,72 @@ import AWSIoTPythonSDK.exception.AWSIoTExceptions
 
 SHADOW_VAR = 'supervised'
 
-processes = {}
+pulses = {}
 
 
-def publish_status(delay=0):
-    time.sleep(delay)
-    results = proxy.supervisor.getAllProcessInfo()
-    for s in results:
-        processes[s['name']] = s['statename']
+def status():
+    processes = proxy.supervisor.getAllProcessInfo()
+    procs = {}
+    for s in processes:
+        procs[s['name']] = s['statename']
     logger.info("supervised: {}".format(processes))
     try:
         myAWSIoTMQTTClient.publish(
             piot.iot_thing_topic(args.thing),
-            piot.iot_payload('reported', processes), 0)
+            piot.iot_payload('reported', procs), 0)
     except (AWSIoTPythonSDK.exception.AWSIoTExceptions.publishTimeoutException,
             AWSIoTPythonSDK.exception.AWSIoTExceptions.subscribeTimeoutException):
         logger.warn("callback publish timeout")
 
 
+def start(process):
+    try:
+        proxy.supervisor.startProcess(process)
+    except Exception as err:
+        logging.error("{} {} failed {}".format('start', process, err))
+    status()
+
+
+def stop(process):
+    try:
+        proxy.supervisor.stopProcess(process)
+    except Exception as err:
+        logging.error("{} {} failed {}".format('stop', process, err))
+    status()
+
+
+def restart():
+    try:
+        proxy.supervisor.restart()
+    except Exception as err:
+        logging.error("{} failed {}".format('restart', err))
+    status()
+
+
+def pulse(process, seconds=10):
+    try:
+        proc = proxy.supervisor.getProcessInfo(process)
+        if proc['state'] == 0:
+            start(process)
+        pulses[process] = datetime.now() + timedelta(seconds=int(seconds))
+    except Exception as err:
+        logging.error("{} {} failed {}".format('pulse', process, err))
+
+
 def callback(client, userdata, message):
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
-    cmd, arg = piot.topic_parser(args.topic, message.topic)
+    cmd, arg, arg2 = piot.topic_parser(args.topic, message.topic)
     logger.info("{} {}".format(cmd, arg))
     if cmd == 'status' and arg is None:
-        publish_status()
-    elif cmd == 'reload' and arg is None:
-        try:
-            proxy.supervisor.restart()
-        except Exception as err:
-            logging.error("{} failed {}".format(cmd, err))
-        publish_status(10)
+        status()
+    elif cmd == 'restart' and arg is None and arg2 is None:
+        restart()
     elif cmd == 'start' and arg is not None:
-        try:
-            proxy.supervisor.startProcess(arg)
-        except Exception as err:
-            logging.error("{} {} failed {}".format(cmd, arg, err))
-        publish_status(4)
+        start(arg)
     elif cmd == 'stop' and arg is not None:
-        try:
-            proxy.supervisor.stopProcess(arg)
-        except Exception as err:
-            logging.error("{} {} failed {}".format(cmd, arg, err))
-        publish_status(4)
+        stop(arg)
+    elif cmd == 'pulse' and arg is not None and arg2 is not None:
+        pulse(arg, arg2)
     else:
         logging.error('invalid command {} {}'.format(cmd, arg))
 
@@ -100,4 +125,8 @@ if __name__ == "__main__":
     time.sleep(2)
 
     while True:
+        for key, value in pulses.iteritems():
+            if datetime.now() > value:
+                stop(key)
+                del pulses[key]
         time.sleep(1)

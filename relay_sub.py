@@ -24,7 +24,7 @@ def device(cmd):
 
 def callback(client, user_data, message):
     logger.debug("callback message {} {}".format(message.topic, message.payload))
-    cmd, arg = piot.topic_parser(args.topic, message.topic)
+    cmd, arg, arg2 = piot.topic_parser(args.topic, message.topic)
     logger.info("callback {} {}".format(cmd, arg))
     if cmd in piot.TOPIC_STATUS_PULSE:
         device(1)
