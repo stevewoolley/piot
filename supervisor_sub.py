@@ -62,13 +62,13 @@ def pulse(process, seconds=10):
             start(process)
         pulses[process] = datetime.now() + timedelta(seconds=int(seconds))
     except Exception as err:
-        logging.error("{} {} failed {}".format('pulse', process, err))
+        logging.error("{} {} {} failed {}".format('pulse', process, seconds, err))
 
 
 def callback(client, userdata, message):
     logger.debug("message topic {} payload {}".format(message.topic, message.payload))
     cmd, arg, arg2 = piot.topic_parser(args.topic, message.topic)
-    logger.info("{} {}".format(cmd, arg))
+    logger.info("{} {} {}".format(cmd, arg, arg2))
     if cmd == 'status' and arg is None:
         status()
     elif cmd == 'restart' and arg is None and arg2 is None:
