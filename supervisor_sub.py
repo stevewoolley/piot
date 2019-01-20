@@ -32,6 +32,8 @@ def status():
 
 
 def start(process):
+    if process in pulses:
+        del pulses[process]
     try:
         proxy.supervisor.startProcess(process)
     except Exception as err:
@@ -40,6 +42,8 @@ def start(process):
 
 
 def stop(process):
+    if process in pulses:
+        del pulses[process]
     try:
         proxy.supervisor.stopProcess(process)
     except Exception as err:
@@ -128,5 +132,4 @@ if __name__ == "__main__":
         for key, value in pulses.iteritems():
             if datetime.now() > value:
                 stop(key)
-                del pulses[key]
         time.sleep(1)
