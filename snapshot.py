@@ -20,5 +20,5 @@ if __name__ == "__main__":
     sleep(2)  # Camera warm-up time
     output = "{}-{}-{}.{}".format(args.prefix, args.thing, datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
                                   args.format)
-    camera.capture(args.output, format=args.format)
+    camera.capture(output, format=args.format)
     camera.close()
