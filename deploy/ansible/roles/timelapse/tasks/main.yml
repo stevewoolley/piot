@@ -4,6 +4,14 @@
     full_hostname: "{{ inventory_hostname }}"
     short_hostname: "{{ inventory_hostname.split('.', 1)[0] }}"
 
+- name: 'Install python dependencies'
+  pip:
+    name: [
+      'picamera'
+    ]
+    state: latest
+  become: yes
+
 - name: 'Clone/Update latest repo'
   git:
     repo: https://github.com/stevewoolley/piot.git
