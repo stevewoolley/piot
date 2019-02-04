@@ -9,8 +9,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output", action="store", required=True, dest="output", help="Output filename")
     parser.add_argument("-f", "--format", action="store", default='jpeg', dest="format", help="Output format")
-    parser.add_argument("--width", action="store", default=3280, dest="width", help="Resolution width")
-    parser.add_argument("--height", action="store", default=2464, dest="height", help="Resultion height")
+    parser.add_argument("--width", action="store", default=3280, type=int, dest="width", help="Resolution width")
+    parser.add_argument("--height", action="store", default=2464, type=int, dest="height", help="Resolution height")
     args = parser.parse_args()
 
     camera = PiCamera()
