@@ -37,7 +37,7 @@
   cron:
     name: "snapshot every minute"
     minute: "0"
-    job: "/home/pi/piot/snapshot.py --width 1024 --height 768 --nix_before 8 --nix_after 17"
+    job: "/home/pi/piot/snapshot.py --width 1024 --height 768 --nix_before 8 --nix_after 17 -p timelapse"
   become: yes
   become_user: "{{ user }}"
 
