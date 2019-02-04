@@ -44,7 +44,7 @@
   cron:
     name: "timelapse hourly archive"
     minute: "0"
-    job: "/usr/local/bin/aws s3 mv /tmp s3://archive.snerted.com/ --recursive --exclude \"*\" --include \"timelapse-{{ short_hostname }}*.jpg\""
+    job: "/usr/local/bin/aws s3 mv /tmp s3://archive.snerted.com/ --recursive --exclude \"*\" --include \"timelapse-{{ short_hostname }}*.jpeg\""
   become: yes
   become_user: "{{ user }}"
 
