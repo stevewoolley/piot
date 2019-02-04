@@ -20,18 +20,26 @@
   become: yes
   become_user: "{{ user }}"
 
-- name: 'create timelapse supervisor conf'
+#- name: 'create timelapse supervisor conf'
+#  become: yes
+#  template:
+#    src: timelapse.conf.j2
+#    dest: /etc/supervisor/conf.d/timelapse.conf
+#    mode: 0644
+#
+#- name: 'restart timelapse via supervisor'
+#  supervisorctl:
+#    name: timelapse
+#    state: present
+#  become: yes
+-
+- name: 'Crontab entry snapshot once a minute'
+  cron:
+    name: "snapshot every minute"
+    minute: "0"
+    job: "/home/pi/piot/snapshot.py --width 1024 --height 768 --nix_before 8 --nix_after 17"
   become: yes
-  template:
-    src: timelapse.conf.j2
-    dest: /etc/supervisor/conf.d/timelapse.conf
-    mode: 0644
-
-- name: 'restart timelapse via supervisor'
-  supervisorctl:
-    name: timelapse
-    state: present
-  become: yes
+  become_user: "{{ user }}"
 
 - name: 'Crontab entry for timelapse hourly'
   cron:
@@ -39,3 +47,5 @@
     minute: "0"
     job: "/usr/local/bin/aws s3 mv /tmp s3://archive.snerted.com/ --recursive --exclude \"*\" --include \"timelapse-{{ short_hostname }}*.jpg\""
   become: yes
+  become_user: "{{ user }}"
+

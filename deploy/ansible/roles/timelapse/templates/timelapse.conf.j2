@@ -1,6 +1,6 @@
 [program:timelapse]
 command=
-    /usr/bin/raspistill -t 0 -tl {{ timelapse_milliseconds }} -dt -o timelapse-{{ short_hostname }}-%%04d.jpg
+    {{ webapps_dir }}/pir_pub.py
 directory=/tmp
 autostart=false
 autorestart=true
