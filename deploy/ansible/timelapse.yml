@@ -1,0 +1,6 @@
+---
+- hosts:
+    - home-timelapse
+    - office-timelapse
+  roles:
+    - timelapse

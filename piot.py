@@ -45,6 +45,17 @@ def cloudwatch_metric_data(hostname, metric, value, unit, dimension='hostname'):
         },
     ]
 
+def mv_to_s3(file_name, bucket, tags=None):
+    s3 = boto3.resource('s3')
+    s3.meta.client.upload_file(file_name, bucket, file_name)
+    t = []
+    if tags is not None:
+        for k, v in tags.items():
+            t.append({'Key': k.strip(), 'Value': v.strip()})
+        s3.meta.client.put_object_tagging(Bucket=bucket, Key=file_name, Tagging={'TagSet': t})
+    rm(file_name)
+
+
 
 def init_aws_iot_mqtt_client(args):
     # Init AWSIoTMQTTClient
