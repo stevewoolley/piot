@@ -38,6 +38,7 @@
     name: "snapshot every minute"
     job: "/home/pi/piot/snapshot.py --width 1024 --height 768 -p timelapse"
     hour: "8-17"
+    weekday: "1-5"
   become: yes
   become_user: "{{ user }}"
 
